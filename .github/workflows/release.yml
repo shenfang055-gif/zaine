@@ -15,8 +15,6 @@ jobs:
     runs-on: macos-14
     steps:
       - uses: actions/checkout@v5
-        with:
-          ref: v0.1.0
       - uses: actions/setup-node@v5
         with:
           node-version: 24
@@ -37,8 +35,6 @@ jobs:
     runs-on: windows-2022
     steps:
       - uses: actions/checkout@v5
-        with:
-          ref: v0.1.0
       - uses: actions/setup-node@v5
         with:
           node-version: 24
