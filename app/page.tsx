@@ -547,50 +547,39 @@ function MarkdownPreview({ markdown }: { markdown: string }) {
   })}</div>;
 }
 
-function scratchDateLabel(value: string) {
-  const noteDate = new Date(`${value}T00:00:00`);
-  const now = new Date();
-  const base = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const days = Math.round((base.getTime() - noteDate.getTime()) / 86400000);
-  if (days === 0) return "今天";
-  if (days === 1) return "昨天";
-  return `${noteDate.getMonth() + 1} 月 ${noteDate.getDate()} 日`;
+function ideaTimestamp(value: Date) {
+  const time = `${String(value.getHours()).padStart(2, "0")}:${String(value.getMinutes()).padStart(2, "0")}`;
+  return `${value.getFullYear()} 年 ${value.getMonth() + 1} 月 ${value.getDate()} 日 · ${time}`;
 }
 
 function ScratchNotes({ notes, selected, setSelected, saveNotes }: { notes: Note[]; selected: Note; setSelected: (note: Note) => void; saveNotes: (notes: Note[]) => void }) {
   const [mode, setMode] = useState<"preview" | "edit">("preview");
   const [ideaOpen, setIdeaOpen] = useState(false);
   const [idea, setIdea] = useState("");
-  const sorted = [...notes].sort((a, b) => b.date.localeCompare(a.date) || b.id - a.id);
-  const groups = sorted.reduce<Record<string, Note[]>>((result, note) => { (result[note.date] ??= []).push(note); return result; }, {});
 
   function updateSelected(changes: Partial<Note>) {
-    const updated = { ...selected, ...changes, time: "刚刚" };
+    const updated = { ...selected, ...changes, time: changes.time ?? "刚刚" };
     setSelected(updated);
     saveNotes(notes.map(note => note.id === selected.id ? updated : note));
   }
-  function createNote() {
-    const note: Note = { id: Date.now(), title: "未命名随手记", body: "# 未命名随手记\n\n从这里写下一点想法……", tag: "随手记", time: "刚刚", color: "sage", date: dateKey(new Date()) };
-    saveNotes([note, ...notes]);
-    setSelected(note);
-    setMode("edit");
-  }
   function appendIdea() {
     if (!idea.trim()) return;
-    updateSelected({ body: `${selected.body.trim()}\n\n${idea.trim()}` });
+    const now = new Date();
+    const time = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+    updateSelected({
+      body: `${selected.body.trim()}\n\n## ${ideaTimestamp(now)}\n\n${idea.trim()}`,
+      date: dateKey(now),
+      time,
+    });
     setIdea("");
     setIdeaOpen(false);
     setMode("preview");
   }
 
-  return <div className="scratch-layout">
-    <section className="scratch-list">
-      <div className="scratch-toolbar"><div><strong>{notes.length}</strong><span>篇随手记</span></div><button onClick={createNote}><Icon name="plus" size={15}/> 新建文件</button></div>
-      <div className="scratch-groups">{Object.entries(groups).map(([date, group]) => <section key={date}><header><strong>{scratchDateLabel(date)}</strong><span>{date}</span></header>{group.map(note => <button key={note.id} className={selected.id === note.id ? "active" : ""} onClick={() => { setSelected(note); setMode("preview"); }}><span className={`note-swatch ${note.color}`}/><div><strong>{note.title}</strong><p>{note.body.replace(/[#>*`\[\]-]/g, " ").replace(/\s+/g, " ").trim()}</p><span>{note.time} · Markdown</span></div></button>)}</section>)}</div>
-    </section>
+  return <div className="scratch-layout scratch-single">
     <article className="scratch-document">
-      <header><div><span className={`note-swatch ${selected.color}`}/><span>{selected.date} · {selected.tag}</span></div><div className="document-actions"><button onClick={() => setIdeaOpen(!ideaOpen)}><Icon name="plus" size={15}/> 添加想法</button><div className="mode-switch"><button className={mode === "edit" ? "active" : ""} onClick={() => setMode("edit")}>编辑</button><button className={mode === "preview" ? "active" : ""} onClick={() => setMode("preview")}>预览</button></div></div></header>
-      {ideaOpen && <div className="idea-composer"><textarea autoFocus value={idea} onChange={event => setIdea(event.target.value)} placeholder="补充一段想法，支持 Markdown…"/><div><button onClick={() => setIdeaOpen(false)}>取消</button><button className="confirm" onClick={appendIdea}>添加到文末</button></div></div>}
+      <header><div><span className={`note-swatch ${selected.color}`}/><span>一份随手记 · {selected.date} 最近更新</span></div><div className="document-actions"><button onClick={() => setIdeaOpen(!ideaOpen)}><Icon name="plus" size={15}/> 添加想法</button><div className="mode-switch"><button className={mode === "edit" ? "active" : ""} onClick={() => setMode("edit")}>编辑</button><button className={mode === "preview" ? "active" : ""} onClick={() => setMode("preview")}>预览</button></div></div></header>
+      {ideaOpen && <div className="idea-composer"><div className="idea-composer-time"><Icon name="clock" size={13}/><span>{ideaTimestamp(new Date())}</span></div><textarea autoFocus value={idea} onChange={event => setIdea(event.target.value)} placeholder="此刻在想什么？支持 Markdown…"/><div><button onClick={() => setIdeaOpen(false)}>取消</button><button className="confirm" onClick={appendIdea}>发布想法</button></div></div>}
       {mode === "edit" ? <div className="markdown-editor"><input value={selected.title} onChange={event => updateSelected({ title: event.target.value })}/><textarea value={selected.body} onChange={event => updateSelected({ body: event.target.value })}/><footer><span>Markdown 编辑</span><span>已自动保存</span></footer></div> : <div className="markdown-document"><MarkdownPreview markdown={selected.body}/><footer><span>Markdown 预览</span><span>最后编辑于 {selected.time}</span></footer></div>}
     </article>
   </div>;
