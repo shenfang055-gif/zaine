@@ -27,11 +27,24 @@ jobs:
         run: npm install --legacy-peer-deps
       - run: npm run desktop:renderer
       - name: Package macOS Apple Silicon
+        id: package_macos
+        continue-on-error: true
         env:
           CSC_IDENTITY_AUTO_DISCOVERY: "false"
           ELECTRON_MIRROR: https://npmmirror.com/mirrors/electron/
           ELECTRON_BUILDER_BINARIES_MIRROR: https://npmmirror.com/mirrors/electron-builder-binaries/
-        run: npx electron-builder --mac zip --arm64 --config.electronDist=node_modules/electron/dist
+        run: |
+          set -o pipefail
+          npx electron-builder --mac zip --arm64 --config.electronDist=node_modules/electron/dist 2>&1 | tee macos-package.log
+      - name: Report macOS packaging failure
+        if: steps.package_macos.outcome == 'failure'
+        run: |
+          details="$(tail -n 60 macos-package.log)"
+          details="${details//'%'/'%25'}"
+          details="${details//$'\r'/'%0D'}"
+          details="${details//$'\n'/'%0A'}"
+          echo "::error file=.github/workflows/release.yml,title=macOS packaging failed::$details"
+          exit 1
       - uses: actions/upload-artifact@v4
         with:
           name: macos-release
@@ -52,11 +65,24 @@ jobs:
         run: npm install --legacy-peer-deps
       - run: npm run desktop:renderer
       - name: Package Windows x64
+        id: package_windows
+        continue-on-error: true
         env:
           CSC_IDENTITY_AUTO_DISCOVERY: "false"
           ELECTRON_MIRROR: https://npmmirror.com/mirrors/electron/
           ELECTRON_BUILDER_BINARIES_MIRROR: https://npmmirror.com/mirrors/electron-builder-binaries/
-        run: npx electron-builder --win nsis --x64 --config.electronDist=node_modules/electron/dist
+        shell: pwsh
+        run: |
+          npx electron-builder --win nsis --x64 --config.electronDist=node_modules/electron/dist 2>&1 | Tee-Object windows-package.log
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Report Windows packaging failure
+        if: steps.package_windows.outcome == 'failure'
+        shell: pwsh
+        run: |
+          $details = [string]::Join([Environment]::NewLine, (Get-Content windows-package.log -Tail 60))
+          $details = $details.Replace('%', '%25').Replace("`r", '%0D').Replace("`n", '%0A')
+          Write-Output "::error file=.github/workflows/release.yml,title=Windows packaging failed::$details"
+          exit 1
       - uses: actions/upload-artifact@v4
         with:
           name: windows-release
