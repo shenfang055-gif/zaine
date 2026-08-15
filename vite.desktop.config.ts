@@ -10,5 +10,11 @@ export default defineConfig({
   build: {
     outDir: path.resolve(__dirname, "dist-desktop"),
     emptyOutDir: true,
+    rollupOptions: {
+      input: {
+        main: path.resolve(__dirname, "desktop/index.html"),
+        widget: path.resolve(__dirname, "desktop/widget.html"),
+      },
+    },
   },
 });

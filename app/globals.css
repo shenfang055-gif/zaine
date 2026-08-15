@@ -151,6 +151,17 @@ body{margin:0;background:#c8c1b5;color:var(--ink);font-family:"PingFang SC","Hir
 .save kbd{margin-left:7px;opacity:.65}
 .toast{position:fixed;z-index:20;bottom:5vh;left:50%;transform:translateX(-50%);background:#4e5952;color:white;border-radius:10px;padding:10px 16px;display:flex;gap:8px;align-items:center;font-size:11px;box-shadow:0 12px 28px rgba(0,0,0,.2)}
 
+/* The packaged client uses the real operating-system window as its only frame. */
+.electron-app,.electron-app body,.electron-app #root{width:100%;height:100%;overflow:hidden}
+.electron-app .desktop-shell{width:100%;height:100%;min-height:0;padding:0;background:var(--paper);align-items:stretch;justify-content:stretch}
+.electron-app .desktop-shell:before{display:none}
+.electron-app .app-window{width:100%;height:100%;max-width:none;border:0;border-radius:0;box-shadow:none}
+.electron-app .titlebar{-webkit-app-region:drag;height:52px;padding-left:78px}
+.electron-app .titlebar button,.electron-app .titlebar a{-webkit-app-region:no-drag}
+.electron-app .traffic{visibility:hidden}
+.electron-app .workspace{height:calc(100% - 52px)}
+.electron-app .floating-note{display:none}
+
 .calendar-layout{height:calc(100% - 112px);padding:28px 30px;display:grid;grid-template-columns:1fr 290px;gap:18px}
 .calendar-card,.day-detail{border:1px solid #dedad2;background:#faf8f3;border-radius:16px}
 .calendar-card{padding:24px}

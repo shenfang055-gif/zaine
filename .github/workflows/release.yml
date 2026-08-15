@@ -7,7 +7,7 @@ on:
       - ".github/workflows/release.yml"
   workflow_dispatch:
 
-# v0.1.2 distributes the macOS build as an ad-hoc signed DMG.
+# v0.1.3 adds a persistent, draggable desktop quick-note widget.
 
 permissions:
   contents: write
@@ -40,11 +40,11 @@ jobs:
           mkdir -p release/dmg-root
           ditto "release/mac-arm64/在呢 ZAI NE.app" "release/dmg-root/在呢 ZAI NE.app"
           ln -s /Applications release/dmg-root/Applications
-          hdiutil create -volname "在呢 ZAI NE" -srcfolder release/dmg-root -ov -format UDZO "release/zai-ne-0.1.2-macOS-Apple-Silicon.dmg"
+          hdiutil create -volname "在呢 ZAI NE" -srcfolder release/dmg-root -ov -format UDZO "release/zai-ne-0.1.3-macOS-Apple-Silicon.dmg"
       - uses: actions/upload-artifact@v4
         with:
           name: macos-release
-          path: release/zai-ne-0.1.2-macOS-Apple-Silicon.dmg
+          path: release/zai-ne-0.1.3-macOS-Apple-Silicon.dmg
           if-no-files-found: error
 
   build-windows:
@@ -69,7 +69,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: windows-release
-          path: release/zai-ne-0.1.2-Windows-x64.exe
+          path: release/zai-ne-0.1.3-Windows-x64.exe
           if-no-files-found: error
 
   publish:
@@ -88,9 +88,9 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create v0.1.2 \
-            release-assets/zai-ne-0.1.2-macOS-Apple-Silicon.dmg \
-            release-assets/zai-ne-0.1.2-Windows-x64.exe \
+          gh release create v0.1.3 \
+            release-assets/zai-ne-0.1.3-macOS-Apple-Silicon.dmg \
+            release-assets/zai-ne-0.1.3-Windows-x64.exe \
             --repo "${{ github.repository }}" \
-            --title "在呢 ZAI NE 0.1.2" \
-            --notes "macOS 版现已改为 DMG 安装镜像，并加入基础的本地签名。下载后请将应用拖入“应用程序”；首次打开请在访达中右键应用并选择“打开”。本测试版尚未使用 Apple Developer ID 公证，因此部分 macOS 版本仍可能显示安全提醒。Windows 版继续提供 EXE 安装程序。数据默认只保存在自己的电脑。"
+            --title "在呢 ZAI NE 0.1.3" \
+            --notes "新增真正的桌面悬浮随手记：主窗口最小化后显示始终置顶的可拖动按钮；点击展开侧拉记录框，支持收起；未提交草稿会保存在本机并在下次打开时继续显示。主客户端同时取消了多余的内层窗口边框，内容完整贴合窗口四边。macOS 版为 DMG，Windows 版为 EXE；本测试版尚未使用 Apple Developer ID 公证。"

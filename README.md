@@ -8,16 +8,16 @@
 
 - 待办清单：区分今天截止与后续事项，支持截止日期和倒计时
 - 日历日程：真实月历、开始与结束时间、重复日程、日程图标
-- 随手记：按日期整理 Markdown 灵感，支持快速记录
+- 桌面随手记：客户端最小化后显示可拖动的置顶记录器，草稿收起不丢失，提交后自动进入随手记
 - 知识库：导入正式笔记及附件，并在应用内预览常见格式
 - 本地优先：当前版本无需注册，数据默认保存在每位用户自己的电脑中
 
 ## 下载
 
-- [macOS Apple Silicon 版（DMG）](https://github.com/shenfang055-gif/zaine/releases/download/v0.1.2/zai-ne-0.1.2-macOS-Apple-Silicon.dmg)
-- [Windows 10 / 11 x64 版](https://github.com/shenfang055-gif/zaine/releases/download/v0.1.2/zai-ne-0.1.2-Windows-x64.exe)
+- [macOS Apple Silicon 版（DMG）](https://github.com/shenfang055-gif/zaine/releases/download/v0.1.3/zai-ne-0.1.3-macOS-Apple-Silicon.dmg)
+- [Windows 10 / 11 x64 版](https://github.com/shenfang055-gif/zaine/releases/download/v0.1.3/zai-ne-0.1.3-Windows-x64.exe)
 
-当前为 `0.1.2` 公开测试版。macOS 版打开 DMG 后请将应用拖入“应用程序”，再在访达中右键应用并选择“打开”。测试版尚未经过 Apple 公证，部分系统仍可能显示安全提醒。
+当前为 `0.1.3` 公开测试版。macOS 版打开 DMG 后请将应用拖入“应用程序”，再在访达中右键应用并选择“打开”。测试版尚未经过 Apple 公证，部分系统仍可能显示安全提醒。
 
 ## 本地开发
 
@@ -40,7 +40,7 @@ npm run dist:win       # 打包 Windows x64
 
 ## 数据说明
 
-`0.1.2` 不连接云端数据库。每次安装拥有独立的本地数据空间，不会自动与其他用户共享。卸载应用或清理应用数据前，请先自行备份重要内容。
+`0.1.3` 不连接云端数据库。每次安装拥有独立的本地数据空间，不会自动与其他用户共享。卸载应用或清理应用数据前，请先自行备份重要内容。
 
 ## License
 

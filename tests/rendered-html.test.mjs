@@ -42,10 +42,10 @@ test("server-renders the current public download page", async () => {
   const response = await render("/download");
   assert.equal(response.status, 200);
   const html = await response.text();
-  assert.match(html, /PUBLIC BETA · 0\.1\.2/);
-  assert.match(html, /zai-ne-0\.1\.2-macOS-Apple-Silicon\.dmg/);
-  assert.match(html, /zai-ne-0\.1\.2-Windows-x64\.exe/);
-  assert.match(html, /每条想法独立保存并按时间倒序排列/);
+  assert.match(html, /PUBLIC BETA · 0\.1\.3/);
+  assert.match(html, /zai-ne-0\.1\.3-macOS-Apple-Silicon\.dmg/);
+  assert.match(html, /zai-ne-0\.1\.3-Windows-x64\.exe/);
+  assert.match(html, /客户端最小化后仍可悬浮记录/);
 });
 
 test("keeps every scratch entry independent and time ordered", async () => {
@@ -56,4 +56,18 @@ test("keeps every scratch entry independent and time ordered", async () => {
   assert.match(page, /selected\.id === note\.id/);
   assert.match(page, /createdAt: now\.toISOString\(\)/);
   assert.doesNotMatch(page, /body: `\$\{selected\.body\.trim\(\)\}/);
+});
+
+test("builds a persistent always-on-top desktop quick-note widget", async () => {
+  const main = await readFile(new URL("../desktop/main.cjs", import.meta.url), "utf8");
+  const widget = await readFile(new URL("../desktop/widget.tsx", import.meta.url), "utf8");
+  const css = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
+  assert.match(main, /alwaysOnTop: true/);
+  assert.match(main, /mainWindow\.on\("minimize", showWidget\)/);
+  assert.match(main, /widget:set-expanded/);
+  assert.match(main, /widget:move/);
+  assert.match(widget, /zaine-widget-draft/);
+  assert.match(widget, /localStorage\.setItem\(DRAFT_KEY, draft\)/);
+  assert.match(widget, /saveNote\(note\)/);
+  assert.match(css, /\.electron-app \.app-window\{width:100%;height:100%;max-width:none;border:0;border-radius:0;box-shadow:none\}/);
 });

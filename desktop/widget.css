@@ -1,0 +1,27 @@
+:root{font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;color:#3f4943}
+*{box-sizing:border-box}
+html,body,#widget-root{width:100%;height:100%;margin:0;background:transparent;overflow:hidden}
+button,textarea{font:inherit}
+.note-bubble{position:absolute;right:5px;bottom:5px;width:72px;height:72px;border-radius:50%;border:1px solid rgba(255,255,255,.72);background:#7f9184;color:#fff;box-shadow:0 15px 34px rgba(48,57,51,.34),inset 0 0 0 1px rgba(255,255,255,.12);display:grid;place-items:center;cursor:grab;touch-action:none}
+.note-bubble:active{cursor:grabbing;transform:scale(.98)}
+.note-bubble span{position:absolute;right:78px;bottom:23px;white-space:nowrap;background:#4f5a53;color:#fff;border-radius:8px;padding:7px 10px;font-size:10px;opacity:0;transform:translateX(5px);transition:.18s;pointer-events:none}
+.note-bubble:hover span{opacity:1;transform:none}
+.note-bubble i{position:absolute;right:5px;top:5px;width:12px;height:12px;border-radius:50%;background:#c48f7e;border:2px solid #eef1ec}
+.widget-stage{width:100%;height:100%;padding:10px 14px 18px 10px;display:flex;align-items:stretch;justify-content:stretch}
+.note-drawer{width:100%;height:100%;border:1px solid rgba(255,255,255,.78);border-radius:20px;background:rgba(241,237,229,.97);box-shadow:0 24px 58px rgba(50,55,50,.3);overflow:hidden;display:grid;grid-template-rows:52px 38px 1fr 66px;animation:slide-in .2s ease-out}
+@keyframes slide-in{from{opacity:0;transform:translateX(24px) scale(.97)}to{opacity:1;transform:none}}
+.drawer-drag{-webkit-app-region:drag;background:#e5e2da;border-bottom:1px solid #d6d2c9;display:flex;align-items:center;justify-content:space-between;padding:0 16px;font-size:11px;font-weight:600;letter-spacing:.05em}
+.drawer-drag>div{display:flex;align-items:center;gap:8px}
+.brand-dot{width:9px;height:9px;border-radius:50%;background:#b98c7b;box-shadow:0 0 0 4px rgba(185,140,123,.12)}
+.drawer-drag button{-webkit-app-region:no-drag;border:0;background:rgba(255,255,255,.45);border-radius:13px;padding:5px 9px;color:#747c77;font-size:9px;cursor:pointer}
+.draft-state{display:flex;align-items:center;justify-content:space-between;padding:0 18px;color:#929790;font-size:8.5px;border-bottom:1px solid #e1ddd5}
+.draft-state time{font-family:Georgia,"Songti SC",serif}
+.note-drawer textarea{width:100%;height:100%;min-height:0;border:0;background:#f8f5ef;resize:none;outline:0;padding:23px 22px;color:#4e5852;font:15px/1.8 Georgia,"Songti SC",serif}
+.note-drawer textarea::placeholder{color:#aaa9a3}
+.note-drawer footer{border-top:1px solid #dbd7ce;background:#eae6de;display:flex;align-items:center;justify-content:space-between;padding:0 14px}
+.note-drawer footer>div{display:flex;align-items:center;gap:8px;font-size:8px;color:#8d938e}
+.note-drawer footer span{background:#dad7cf;border-radius:12px;padding:5px 8px}
+.note-drawer footer em{font-style:normal}
+.note-drawer footer button{height:36px;border:0;border-radius:10px;background:#7d8f82;color:white;padding:0 12px;font-size:10px;cursor:pointer;box-shadow:0 6px 14px rgba(76,94,81,.18)}
+.note-drawer footer button:disabled{opacity:.42;cursor:default;box-shadow:none}
+.note-drawer footer kbd{font-size:8px;margin-left:8px;opacity:.6}

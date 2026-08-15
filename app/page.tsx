@@ -211,12 +211,29 @@ export default function Home() {
     }
     const key = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.key.toLowerCase() === "n") {
-        e.preventDefault(); setQuickOpen(true);
+        e.preventDefault();
+        if (window.zaineDesktop) window.zaineDesktop.showQuickWidget();
+        else setQuickOpen(true);
       }
       if (e.key === "Escape") setQuickOpen(false);
     };
     window.addEventListener("keydown", key);
     return () => window.removeEventListener("keydown", key);
+  }, []);
+
+  useEffect(() => {
+    if (!window.zaineDesktop) return;
+    return window.zaineDesktop.onQuickNoteSaved((note) => {
+      setNotes(current => {
+        if (current.some(item => item.id === note.id)) return current;
+        const next = sortNotes([note, ...current]);
+        localStorage.setItem("mori-notes", JSON.stringify(next));
+        return next;
+      });
+      setSelectedNote(note);
+      setView("notes");
+      notify("桌面随手记已保存");
+    });
   }, []);
 
   useEffect(() => { if (quickOpen) setTimeout(() => quickRef.current?.focus(), 80); }, [quickOpen]);
@@ -330,7 +347,7 @@ export default function Home() {
         </div>
       </section>
 
-      <button className="floating-note" onClick={() => setQuickOpen(true)} aria-label="打开随手记"><Icon name="pen" size={23}/><span>随手记</span></button>
+      <button className="floating-note" onClick={() => window.zaineDesktop ? window.zaineDesktop.showQuickWidget() : setQuickOpen(true)} aria-label="打开随手记"><Icon name="pen" size={23}/><span>随手记</span></button>
 
       {quickOpen && <div className="quick-overlay" onMouseDown={(e) => e.target === e.currentTarget && setQuickOpen(false)}>
         <section className="quick-card" role="dialog" aria-label="快捷记录">
