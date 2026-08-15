@@ -1,0 +1,79 @@
+name: Build and publish desktop release
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/release.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-macos:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: v0.1.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run desktop:renderer
+      - name: Package macOS Apple Silicon
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: "false"
+        run: npx electron-builder --mac zip --arm64 --config.electronDist=node_modules/electron/dist
+      - uses: actions/upload-artifact@v4
+        with:
+          name: macos-release
+          path: release/zai-ne-0.1.0-macOS-Apple-Silicon.zip
+          if-no-files-found: error
+
+  build-windows:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: v0.1.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run desktop:renderer
+      - name: Package Windows x64
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: "false"
+        run: npx electron-builder --win nsis --x64
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows-release
+          path: release/zai-ne-0.1.0-Windows-x64.exe
+          if-no-files-found: error
+
+  publish:
+    needs: [build-macos, build-windows]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: macos-release
+          path: release-assets
+      - uses: actions/download-artifact@v4
+        with:
+          name: windows-release
+          path: release-assets
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create v0.1.0 \
+            release-assets/zai-ne-0.1.0-macOS-Apple-Silicon.zip \
+            release-assets/zai-ne-0.1.0-Windows-x64.exe \
+            --repo "${{ github.repository }}" \
+            --title "在呢 ZAI NE 0.1.0" \
+            --notes "公开测试版：待办、真实日历、Markdown 随手记与本地知识库。无需注册，数据默认只保存在自己的电脑。安装包暂未进行商店签名，首次打开时系统可能显示安全提醒。"
