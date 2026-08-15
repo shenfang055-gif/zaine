@@ -7,7 +7,7 @@ on:
       - ".github/workflows/release.yml"
   workflow_dispatch:
 
-# v0.1.1 adds independent, time-ordered scratch-note entries.
+# v0.1.2 distributes the macOS build as an ad-hoc signed DMG.
 
 permissions:
   contents: write
@@ -26,16 +26,25 @@ jobs:
           ELECTRON_MIRROR: https://npmmirror.com/mirrors/electron/
         run: npm install --legacy-peer-deps
       - run: npm run desktop:renderer
-      - name: Package macOS Apple Silicon
+      - name: Build and ad-hoc sign macOS Apple Silicon app
         env:
           CSC_IDENTITY_AUTO_DISCOVERY: "false"
           ELECTRON_MIRROR: https://npmmirror.com/mirrors/electron/
           ELECTRON_BUILDER_BINARIES_MIRROR: https://npmmirror.com/mirrors/electron-builder-binaries/
-        run: npx electron-builder --mac zip --arm64 --publish never
+        run: |
+          npx electron-builder --mac --arm64 --dir --publish never
+          codesign --force --deep --sign - "release/mac-arm64/在呢 ZAI NE.app"
+          codesign --verify --deep --strict "release/mac-arm64/在呢 ZAI NE.app"
+      - name: Create macOS DMG installer
+        run: |
+          mkdir -p release/dmg-root
+          ditto "release/mac-arm64/在呢 ZAI NE.app" "release/dmg-root/在呢 ZAI NE.app"
+          ln -s /Applications release/dmg-root/Applications
+          hdiutil create -volname "在呢 ZAI NE" -srcfolder release/dmg-root -ov -format UDZO "release/zai-ne-0.1.2-macOS-Apple-Silicon.dmg"
       - uses: actions/upload-artifact@v4
         with:
           name: macos-release
-          path: release/zai-ne-0.1.1-macOS-Apple-Silicon.zip
+          path: release/zai-ne-0.1.2-macOS-Apple-Silicon.dmg
           if-no-files-found: error
 
   build-windows:
@@ -60,7 +69,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: windows-release
-          path: release/zai-ne-0.1.1-Windows-x64.exe
+          path: release/zai-ne-0.1.2-Windows-x64.exe
           if-no-files-found: error
 
   publish:
@@ -79,9 +88,9 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create v0.1.1 \
-            release-assets/zai-ne-0.1.1-macOS-Apple-Silicon.zip \
-            release-assets/zai-ne-0.1.1-Windows-x64.exe \
+          gh release create v0.1.2 \
+            release-assets/zai-ne-0.1.2-macOS-Apple-Silicon.dmg \
+            release-assets/zai-ne-0.1.2-Windows-x64.exe \
             --repo "${{ github.repository }}" \
-            --title "在呢 ZAI NE 0.1.1" \
-            --notes "本次更新修复随手记：每条想法独立保存，按发布时间倒序排列；快捷记录不会覆盖原文；编辑模式只编辑当前选中的一条。数据仍默认只保存在自己的电脑。安装包暂未进行商店签名，首次打开时系统可能显示安全提醒。"
+            --title "在呢 ZAI NE 0.1.2" \
+            --notes "macOS 版现已改为 DMG 安装镜像，并加入基础的本地签名。下载后请将应用拖入“应用程序”；首次打开请在访达中右键应用并选择“打开”。本测试版尚未使用 Apple Developer ID 公证，因此部分 macOS 版本仍可能显示安全提醒。Windows 版继续提供 EXE 安装程序。数据默认只保存在自己的电脑。"

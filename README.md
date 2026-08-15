@@ -14,10 +14,10 @@
 
 ## 下载
 
-- [macOS Apple Silicon 版](https://github.com/shenfang055-gif/zaine/releases/download/v0.1.0/zai-ne-0.1.0-macOS-Apple-Silicon.zip)
-- [Windows 10 / 11 x64 版](https://github.com/shenfang055-gif/zaine/releases/download/v0.1.0/zai-ne-0.1.0-Windows-x64.exe)
+- [macOS Apple Silicon 版（DMG）](https://github.com/shenfang055-gif/zaine/releases/download/v0.1.2/zai-ne-0.1.2-macOS-Apple-Silicon.dmg)
+- [Windows 10 / 11 x64 版](https://github.com/shenfang055-gif/zaine/releases/download/v0.1.2/zai-ne-0.1.2-Windows-x64.exe)
 
-当前为 `0.1.0` 公开测试版，安装包尚未进行 Apple 与 Microsoft 商店签名，首次打开时系统可能显示安全提醒。
+当前为 `0.1.2` 公开测试版。macOS 版打开 DMG 后请将应用拖入“应用程序”，再在访达中右键应用并选择“打开”。测试版尚未经过 Apple 公证，部分系统仍可能显示安全提醒。
 
 ## 本地开发
 
@@ -40,14 +40,7 @@ npm run dist:win       # 打包 Windows x64
 
 ## 数据说明
 
-`0.1.0` 不连接云端数据库。每次安装拥有独立的本地数据空间，不会自动与其他用户共享。卸载应用或清理应用数据前，请先自行备份重要内容。
-
-## 文件校验值
-
-```text
-macOS   a7c6bc7f636739d1d57d38988a5de49f9d16c42903a306835ad6a770e951f860
-Windows c32b84c1f37cf512ae2ec1821821cd7750b6d7cb411819dcfbab94a28ead6696
-```
+`0.1.2` 不连接云端数据库。每次安装拥有独立的本地数据空间，不会自动与其他用户共享。卸载应用或清理应用数据前，请先自行备份重要内容。
 
 ## License
 

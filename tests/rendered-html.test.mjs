@@ -42,9 +42,9 @@ test("server-renders the current public download page", async () => {
   const response = await render("/download");
   assert.equal(response.status, 200);
   const html = await response.text();
-  assert.match(html, /PUBLIC BETA · 0\.1\.1/);
-  assert.match(html, /zai-ne-0\.1\.1-macOS-Apple-Silicon\.zip/);
-  assert.match(html, /zai-ne-0\.1\.1-Windows-x64\.exe/);
+  assert.match(html, /PUBLIC BETA · 0\.1\.2/);
+  assert.match(html, /zai-ne-0\.1\.2-macOS-Apple-Silicon\.dmg/);
+  assert.match(html, /zai-ne-0\.1\.2-Windows-x64\.exe/);
   assert.match(html, /每条想法独立保存并按时间倒序排列/);
 });
 
