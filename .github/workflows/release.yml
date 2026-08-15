@@ -7,6 +7,8 @@ on:
       - ".github/workflows/release.yml"
   workflow_dispatch:
 
+# v0.1.0 release rebuild with prebuilt macOS and Windows icons.
+
 permissions:
   contents: write
 
