@@ -35,7 +35,7 @@ jobs:
           ELECTRON_BUILDER_BINARIES_MIRROR: https://npmmirror.com/mirrors/electron-builder-binaries/
         run: |
           set -o pipefail
-          npx electron-builder --mac zip --arm64 2>&1 | tee macos-package.log
+          npx electron-builder --mac zip --arm64 --publish never 2>&1 | tee macos-package.log
       - name: Report macOS packaging failure
         if: steps.package_macos.outcome == 'failure'
         run: |
@@ -73,7 +73,7 @@ jobs:
           ELECTRON_BUILDER_BINARIES_MIRROR: https://npmmirror.com/mirrors/electron-builder-binaries/
         shell: pwsh
         run: |
-          npx electron-builder --win nsis --x64 2>&1 | Tee-Object windows-package.log
+          npx electron-builder --win nsis --x64 --publish never 2>&1 | Tee-Object windows-package.log
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Report Windows packaging failure
         if: steps.package_windows.outcome == 'failure'
