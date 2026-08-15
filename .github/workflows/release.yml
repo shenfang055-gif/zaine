@@ -7,7 +7,7 @@ on:
       - ".github/workflows/release.yml"
   workflow_dispatch:
 
-# v0.1.0 release rebuild with prebuilt macOS and Windows icons.
+# v0.1.1 adds independent, time-ordered scratch-note entries.
 
 permissions:
   contents: write
@@ -35,7 +35,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: macos-release
-          path: release/zai-ne-0.1.0-macOS-Apple-Silicon.zip
+          path: release/zai-ne-0.1.1-macOS-Apple-Silicon.zip
           if-no-files-found: error
 
   build-windows:
@@ -60,7 +60,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: windows-release
-          path: release/zai-ne-0.1.0-Windows-x64.exe
+          path: release/zai-ne-0.1.1-Windows-x64.exe
           if-no-files-found: error
 
   publish:
@@ -79,9 +79,9 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create v0.1.0 \
-            release-assets/zai-ne-0.1.0-macOS-Apple-Silicon.zip \
-            release-assets/zai-ne-0.1.0-Windows-x64.exe \
+          gh release create v0.1.1 \
+            release-assets/zai-ne-0.1.1-macOS-Apple-Silicon.zip \
+            release-assets/zai-ne-0.1.1-Windows-x64.exe \
             --repo "${{ github.repository }}" \
-            --title "在呢 ZAI NE 0.1.0" \
-            --notes "公开测试版：待办、真实日历、Markdown 随手记与本地知识库。无需注册，数据默认只保存在自己的电脑。安装包暂未进行商店签名，首次打开时系统可能显示安全提醒。"
+            --title "在呢 ZAI NE 0.1.1" \
+            --notes "本次更新修复随手记：每条想法独立保存，按发布时间倒序排列；快捷记录不会覆盖原文；编辑模式只编辑当前选中的一条。数据仍默认只保存在自己的电脑。安装包暂未进行商店签名，首次打开时系统可能显示安全提醒。"

@@ -345,6 +345,19 @@ body{margin:0;background:#c8c1b5;color:var(--ink);font-family:"PingFang SC","Hir
 .md-check>span{width:16px;height:16px;border:1px solid #bfc5bf;border-radius:5px;display:grid;place-items:center;color:white;flex:0 0 auto}
 .md-check>span.checked{background:#87988b;border-color:#87988b}
 .md-fence{font:8px ui-monospace,monospace;color:#999;background:#e8e4dc;border-radius:5px;padding:3px 7px;width:max-content}
+.scratch-feed{flex:1;min-height:0;overflow:auto;padding:12px clamp(28px,7vw,92px) 70px;scroll-behavior:smooth}
+.scratch-entry{width:min(880px,100%);margin:0 auto;border-bottom:1px solid #e2ded6;padding:28px 24px 32px;cursor:pointer;transition:background .18s,box-shadow .18s}
+.scratch-entry:hover{background:rgba(231,235,229,.34)}
+.scratch-entry.active{background:rgba(231,235,229,.52);box-shadow:inset 3px 0 #8b9c8e}
+.scratch-entry-preview h2{font:500 21px/1.35 "Songti SC","STSong",ui-serif,serif;color:#414b45;margin:0}
+.scratch-entry-preview>time,.scratch-entry-editor>time{display:block;margin:7px 0 19px;color:#969d98;font:400 9px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC",sans-serif;letter-spacing:.02em}
+.scratch-entry-preview>.markdown-preview{font-size:14px;line-height:1.95;color:#535c57}
+.scratch-entry-preview>.markdown-preview h1{font-size:22px;margin-bottom:16px}
+.scratch-entry-preview>.markdown-preview h2{font-size:17px;margin:19px 0 8px}
+.scratch-entry-editor{display:flex;flex-direction:column}
+.scratch-entry-editor>input{border:0;background:transparent;outline:0;font:500 21px/1.35 "Songti SC","STSong",ui-serif,serif;color:#414b45;padding:0}
+.scratch-entry-editor>textarea{width:100%;min-height:190px;border:1px solid #dcd7ce;background:#f4f1ea;border-radius:10px;padding:16px;outline:0;resize:vertical;color:#535c57;font:13px/1.9 ui-monospace,SFMono-Regular,Menlo,monospace}
+.scratch-entry-editor>footer{display:flex;justify-content:space-between;margin-top:10px;color:#999f9a;font-size:8px}
 
 .knowledge-layout{height:calc(100% - 112px);display:grid;grid-template-columns:275px 1fr;min-height:0}
 .knowledge-list{background:#e9e6de;border-right:1px solid var(--line);min-height:0;overflow:auto}

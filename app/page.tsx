@@ -16,7 +16,7 @@ import { ShoppingBagIcon } from "@phosphor-icons/react/dist/csr/ShoppingBag";
 import { TreeIcon } from "@phosphor-icons/react/dist/csr/Tree";
 
 type View = "today" | "calendar" | "notes" | "inbox";
-type Note = { id: number; title: string; body: string; tag: string; time: string; color: string; date: string };
+type Note = { id: number; title: string; body: string; tag: string; time: string; color: string; date: string; createdAt?: string };
 type ScheduleIcon = "meal" | "sing" | "coffee" | "study" | "work" | "flight" | "play" | "movie" | "music" | "shop" | "sport" | "ride" | "nature";
 type RepeatRule = "none" | "daily" | "weekly" | "monthly" | "batch";
 type CalendarEvent = { id: number; date: string; time: string; endTime?: string; title: string; color: string; icon?: ScheduleIcon };
@@ -120,6 +120,27 @@ function addDays(date: Date, amount: number) {
   return next;
 }
 
+function noteSortTime(note: Note) {
+  if (note.createdAt) {
+    const value = Date.parse(note.createdAt);
+    if (!Number.isNaN(value)) return value;
+  }
+  const time = /^\d{2}:\d{2}$/.test(note.time) ? note.time : "00:00";
+  const value = Date.parse(`${note.date}T${time}:00`);
+  return Number.isNaN(value) ? note.id : value;
+}
+
+function sortNotes(notes: Note[]) {
+  return [...notes].sort((a, b) => noteSortTime(b) - noteSortTime(a) || b.id - a.id);
+}
+
+function notePreviewBody(note: Note) {
+  const lines = note.body.trim().split("\n");
+  const firstLine = (lines[0] ?? "").replace(/^#{1,6}\s*/, "").trim();
+  if (firstLine === note.title.trim()) return lines.slice(1).join("\n").trim();
+  return note.body.trim() === note.title.trim() ? "" : note.body;
+}
+
 function createSeedEvents(today: Date): CalendarEvent[] {
   return [
     { id: 101, date: dateKey(today), time: "09:30", endTime: "10:30", title: "整理本周产品反馈", color: "sage", icon: "work" },
@@ -164,8 +185,9 @@ export default function Home() {
   useEffect(() => {
     const saved = localStorage.getItem("mori-notes");
     if (saved) {
-      const parsed = (JSON.parse(saved) as Note[]).map((note, index) => ({ ...note, date: note.date ?? dateKey(addDays(new Date(), -index)) }));
+      const parsed = sortNotes((JSON.parse(saved) as Note[]).map((note, index) => ({ ...note, date: note.date ?? dateKey(addDays(new Date(), -index)) })));
       setNotes(parsed);
+      localStorage.setItem("mori-notes", JSON.stringify(parsed));
       if (parsed[0]) setSelectedNote(parsed[0]);
     }
     const savedKnowledge = localStorage.getItem("xianbieji-knowledge");
@@ -213,8 +235,9 @@ export default function Home() {
     localStorage.setItem("shiri-todos", JSON.stringify(next));
   }
   function saveNotes(next: Note[]) {
-    setNotes(next);
-    localStorage.setItem("mori-notes", JSON.stringify(next));
+    const sorted = sortNotes(next);
+    setNotes(sorted);
+    localStorage.setItem("mori-notes", JSON.stringify(sorted));
   }
   function saveKnowledgeNotes(next: KnowledgeNote[]) {
     setKnowledgeNotes(next);
@@ -223,8 +246,10 @@ export default function Home() {
   }
   function saveQuick() {
     if (!quickText.trim()) return;
+    const now = new Date();
     const firstLine = quickText.trim().split("\n")[0].replace(/^#+\s*/, "");
-    const note: Note = { id: Date.now(), title: firstLine.slice(0, 22) || "未命名想法", body: quickText.trim(), tag: "随手记", time: "刚刚", color: "clay", date: dateKey(new Date()) };
+    const time = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+    const note: Note = { id: now.getTime(), title: firstLine.slice(0, 36) || "未命名想法", body: quickText.trim(), tag: "随手记", time, color: "clay", date: dateKey(now), createdAt: now.toISOString() };
     const next = [note, ...notes]; saveNotes(next); setSelectedNote(note);
     setQuickText(""); setQuickOpen(false); notify("已保存到随手记");
   }
@@ -556,31 +581,60 @@ function ScratchNotes({ notes, selected, setSelected, saveNotes }: { notes: Note
   const [mode, setMode] = useState<"preview" | "edit">("preview");
   const [ideaOpen, setIdeaOpen] = useState(false);
   const [idea, setIdea] = useState("");
+  const orderedNotes = useMemo(() => sortNotes(notes), [notes]);
 
   function updateSelected(changes: Partial<Note>) {
-    const updated = { ...selected, ...changes, time: changes.time ?? "刚刚" };
+    const updated = { ...selected, ...changes };
     setSelected(updated);
     saveNotes(notes.map(note => note.id === selected.id ? updated : note));
   }
-  function appendIdea() {
+  function createIdea() {
     if (!idea.trim()) return;
     const now = new Date();
     const time = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
-    updateSelected({
-      body: `${selected.body.trim()}\n\n## ${ideaTimestamp(now)}\n\n${idea.trim()}`,
+    const firstLine = idea.trim().split("\n")[0].replace(/^#+\s*/, "");
+    const note: Note = {
+      id: now.getTime(),
+      title: firstLine.slice(0, 36) || "未命名想法",
+      body: idea.trim(),
+      tag: "随手记",
+      color: "clay",
       date: dateKey(now),
       time,
-    });
+      createdAt: now.toISOString(),
+    };
+    saveNotes([note, ...notes]);
+    setSelected(note);
     setIdea("");
     setIdeaOpen(false);
     setMode("preview");
   }
 
+  function selectEntry(note: Note) {
+    setSelected(note);
+  }
+
   return <div className="scratch-layout scratch-single">
     <article className="scratch-document">
-      <header><div><span className={`note-swatch ${selected.color}`}/><span>一份随手记 · {selected.date} 最近更新</span></div><div className="document-actions"><button onClick={() => setIdeaOpen(!ideaOpen)}><Icon name="plus" size={15}/> 添加想法</button><div className="mode-switch"><button className={mode === "edit" ? "active" : ""} onClick={() => setMode("edit")}>编辑</button><button className={mode === "preview" ? "active" : ""} onClick={() => setMode("preview")}>预览</button></div></div></header>
-      {ideaOpen && <div className="idea-composer"><div className="idea-composer-time"><Icon name="clock" size={13}/><span>{ideaTimestamp(new Date())}</span></div><textarea autoFocus value={idea} onChange={event => setIdea(event.target.value)} placeholder="此刻在想什么？支持 Markdown…"/><div><button onClick={() => setIdeaOpen(false)}>取消</button><button className="confirm" onClick={appendIdea}>发布想法</button></div></div>}
-      {mode === "edit" ? <div className="markdown-editor"><input value={selected.title} onChange={event => updateSelected({ title: event.target.value })}/><textarea value={selected.body} onChange={event => updateSelected({ body: event.target.value })}/><footer><span>Markdown 编辑</span><span>已自动保存</span></footer></div> : <div className="markdown-document"><MarkdownPreview markdown={selected.body}/><footer><span>Markdown 预览</span><span>最后编辑于 {selected.time}</span></footer></div>}
+      <header><div><span className={`note-swatch ${selected.color}`}/><span>{orderedNotes.length} 条想法 · 按时间倒序</span></div><div className="document-actions"><button onClick={() => setIdeaOpen(!ideaOpen)}><Icon name="plus" size={15}/> 添加想法</button><div className="mode-switch"><button className={mode === "edit" ? "active" : ""} onClick={() => { setIdeaOpen(false); setMode("edit"); }}>编辑</button><button className={mode === "preview" ? "active" : ""} onClick={() => setMode("preview")}>预览</button></div></div></header>
+      {ideaOpen && <div className="idea-composer"><div className="idea-composer-time"><Icon name="clock" size={13}/><span>{ideaTimestamp(new Date())}</span></div><textarea autoFocus value={idea} onChange={event => setIdea(event.target.value)} placeholder="此刻在想什么？支持 Markdown…"/><div><button onClick={() => setIdeaOpen(false)}>取消</button><button className="confirm" onClick={createIdea}>发布想法</button></div></div>}
+      <div className="scratch-feed">
+        {orderedNotes.map(note => {
+          const active = selected.id === note.id;
+          return <section key={note.id} className={`scratch-entry ${active ? "active" : ""}`} onClick={() => selectEntry(note)} aria-label={`随手记：${note.title}`}>
+            {mode === "edit" && active ? <div className="scratch-entry-editor" onClick={event => event.stopPropagation()}>
+              <input aria-label="随手记标题" value={selected.title} onChange={event => updateSelected({ title: event.target.value })}/>
+              <time>{ideaTimestamp(new Date(note.createdAt ?? `${note.date}T${/^\d{2}:\d{2}$/.test(note.time) ? note.time : "00:00"}:00`))}</time>
+              <textarea aria-label="随手记正文" value={selected.body} onChange={event => updateSelected({ body: event.target.value })}/>
+              <footer><span>正在编辑这一条 · Markdown</span><span>已自动保存</span></footer>
+            </div> : <div className="scratch-entry-preview">
+              <h2>{note.title}</h2>
+              <time>{ideaTimestamp(new Date(note.createdAt ?? `${note.date}T${/^\d{2}:\d{2}$/.test(note.time) ? note.time : "00:00"}:00`))}</time>
+              {notePreviewBody(note) && <MarkdownPreview markdown={notePreviewBody(note)}/>}
+            </div>}
+          </section>;
+        })}
+      </div>
     </article>
   </div>;
 }

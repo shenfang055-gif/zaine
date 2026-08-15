@@ -1,6 +1,6 @@
 {
   "name": "zai-ne-desktop",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "description": "急急急？先别急，先记录此刻。待办、日程、随手记与知识库桌面客户端。",
   "author": "在呢 ZAI NE",
@@ -16,9 +16,9 @@
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
     "db:generate": "drizzle-kit generate",
     "desktop:renderer": "vite build --config vite.desktop.config.ts",
-    "desktop:mac": "npm run desktop:renderer && ELECTRON_BUILDER_BINARIES_MIRROR=https://npmmirror.com/mirrors/electron-builder-binaries/ ELECTRON_BUILDER_CACHE=$PWD/.cache/electron-builder electron-builder --mac zip --arm64 --config.electronDist=node_modules/electron/dist",
-    "desktop:win": "npm run desktop:renderer && ELECTRON_MIRROR=https://npmmirror.com/mirrors/electron/ ELECTRON_BUILDER_BINARIES_MIRROR=https://npmmirror.com/mirrors/electron-builder-binaries/ ELECTRON_BUILDER_CACHE=$PWD/.cache/electron-builder electron-builder --win nsis --x64",
-    "desktop:all": "npm run desktop:renderer && ELECTRON_BUILDER_CACHE=$PWD/.cache/electron-builder electron-builder --mac zip --arm64 --config.electronDist=node_modules/electron/dist && ELECTRON_BUILDER_CACHE=$PWD/.cache/electron-builder electron-builder --win nsis --x64"
+    "desktop:mac": "npm run desktop:renderer && ELECTRON_BUILDER_BINARIES_MIRROR=https://npmmirror.com/mirrors/electron-builder-binaries/ ELECTRON_BUILDER_CACHE=$PWD/.cache/electron-builder electron-builder --mac zip --arm64 --publish never",
+    "desktop:win": "npm run desktop:renderer && ELECTRON_MIRROR=https://npmmirror.com/mirrors/electron/ ELECTRON_BUILDER_BINARIES_MIRROR=https://npmmirror.com/mirrors/electron-builder-binaries/ ELECTRON_BUILDER_CACHE=$PWD/.cache/electron-builder electron-builder --win nsis --x64 --publish never",
+    "desktop:all": "npm run desktop:renderer && ELECTRON_BUILDER_CACHE=$PWD/.cache/electron-builder electron-builder --mac zip --arm64 --publish never && ELECTRON_BUILDER_CACHE=$PWD/.cache/electron-builder electron-builder --win nsis --x64 --publish never"
   },
   "dependencies": {
     "@phosphor-icons/react": "^2.1.10",
