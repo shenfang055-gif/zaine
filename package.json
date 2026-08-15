@@ -75,7 +75,7 @@
       "artifactName": "zai-ne-${version}-macOS-Apple-Silicon.${ext}"
     },
     "win": {
-      "icon": "public/xianbieji-app-icon-transparent.png",
+      "icon": "build/icon.ico",
       "target": [
         {
           "target": "nsis",
